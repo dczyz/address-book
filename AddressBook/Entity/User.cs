@@ -1,9 +1,13 @@
-﻿namespace AddressBook.Entity
+﻿using System.Collections.Generic;
+
+namespace AddressBook.Entity
 {
-    public class User
+    public class User : BaseEntity
     {
-        public int Id { get; set; }
         public string Username { get; set; }
+
         public string Password { get; set; }
+
+        public virtual ICollection<Entry> Entries{ get; set; }
     }
 }
