@@ -14,11 +14,11 @@ namespace AddressBook
         public ApplicationViewModel()
         {
             var login = new LoginViewModel(this);
-            PageViewModels.Add(login.Name, login);
+            PageViewModels.Add(LoginViewModel.Name, login);
             var signUp = new SignUpViewModel(this);
-            PageViewModels.Add(signUp.Name, signUp);
-            var main = new MainViewModel();
-            PageViewModels.Add(main.Name, main);
+            PageViewModels.Add(SignUpViewModel.Name, signUp);
+            var main = new MainViewModel(this);
+            PageViewModels.Add(MainViewModel.Name, main);
 
             CurrentPageViewModel = login;
         }

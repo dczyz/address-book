@@ -3,14 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mainView="clr-namespace:AddressBook.MainView"
              xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              mc:Ignorable="d" 
              Height="650"
              Width="1000" Background="White">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        <CollectionViewSource x:Key="cvs" Source="{Binding Entries}">
+        <CollectionViewSource x:Key="cvs" Source="{Binding MainModel.Entries}">
             <CollectionViewSource.SortDescriptions>
                 <componentModel:SortDescription PropertyName="SecondName" Direction="Ascending"/>
             </CollectionViewSource.SortDescriptions>
@@ -29,7 +28,7 @@
             <RowDefinition Height="71"/>
         </Grid.RowDefinitions>
         <ListBox IsEnabled="{Binding NonNewEntry}" ItemsSource="{Binding Source={StaticResource cvs}}" x:Name="EntriesListBox" HorizontalAlignment="Left" Height="505" Margin="10,0,0,0" Grid.Row="2" Grid.RowSpan="3"
-                 Grid.Column="0" VerticalAlignment="Top" Width="200" SelectedItem="{Binding SelectedEntry}">
+                 Grid.Column="0" VerticalAlignment="Top" Width="200" SelectedItem="{Binding MainModel.SelectedEntry}">
         </ListBox>
         <Grid Visibility="{Binding EntrySelected, Converter={StaticResource BooleanToVisibilityConverter}}" Grid.Column="1" HorizontalAlignment="Left" Height="186" Grid.Row="1" Grid.RowSpan="2" VerticalAlignment="Top" Width="780">
             <Grid.ColumnDefinitions>
@@ -39,18 +38,18 @@
             </Grid.ColumnDefinitions>
             <StackPanel HorizontalAlignment="Left" Height="166" Margin="10,10,0,0" VerticalAlignment="Top" Width="240" Grid.Column="0">
                 <Label x:Name="FirstNameLabel" Content="First name"/>
-                <TextBox x:Name="FirstNameTextBox" Height="23" TextWrapping="Wrap" Text="{Binding FirstName}"/>
+                <TextBox x:Name="FirstNameTextBox" Height="23" TextWrapping="Wrap" Text="{Binding MainModel.FirstName}"/>
                 <Label x:Name="SecondNameLabel" Content="Second name"/>
-                <TextBox x:Name="SecondNameTextBox" Height="23" TextWrapping="Wrap" Text="{Binding SecondName}"/>
+                <TextBox x:Name="SecondNameTextBox" Height="23" TextWrapping="Wrap" Text="{Binding MainModel.SecondName}"/>
                 <Label x:Name="BithdayLabel" Content="Birthday"/>
-                <DatePicker x:Name="BirthdayDatePicker" SelectedDate="{Binding Birthday}"/>
+                <DatePicker x:Name="BirthdayDatePicker" SelectedDate="{Binding MainModel.Birthday}"/>
 
             </StackPanel>
             <StackPanel Grid.Column="1" HorizontalAlignment="Left" Height="166" Margin="10,10,0,0" VerticalAlignment="Top" Width="240">
                 <Label x:Name="PhoneNumber1Label" Content="Phone number 1"/>
-                <TextBox x:Name="PhoneNumber1TextBox" Height="23" TextWrapping="Wrap" Text="{Binding PhoneNumber1}"/>
+                <TextBox x:Name="PhoneNumber1TextBox" Height="23" TextWrapping="Wrap" Text="{Binding MainModel.PhoneNumber1}"/>
                 <Label x:Name="PhoneNumber2Label" Content="Phone number 2"/>
-                <TextBox x:Name="PhoneNumber2TextBox" Height="23" TextWrapping="Wrap" Text="{Binding PhoneNumber2}"/>
+                <TextBox x:Name="PhoneNumber2TextBox" Height="23" TextWrapping="Wrap" Text="{Binding MainModel.PhoneNumber2}"/>
             </StackPanel>
             <Grid Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" Width="250" Margin="0,0,0,10">
                 <Grid.ColumnDefinitions>
@@ -62,11 +61,11 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Border BorderThickness="1" Grid.Column="0" Grid.Row="1" Margin="0,36,0,0" Background="#FFC9C9C9">
-                    <Image x:Name="PhotoImage" HorizontalAlignment="Left" Height="146" VerticalAlignment="Top" Width="155" Margin="0,-1" Source="{Binding Photo}"/>
+                    <Image x:Name="PhotoImage" HorizontalAlignment="Left" Height="146" VerticalAlignment="Top" Width="155" Margin="0,-1" Source="{Binding MainModel.Photo}"/>
                 </Border>
                 <StackPanel Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" Height="140" VerticalAlignment="Top" Width="90" Margin="0,36,0,0">
-                    <Button Command="{Binding LoadPhotoCommand}" x:Name="LoadPhotoButton" Content="Load" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="10,0,0,0"/>
-                    <Button Command="{Binding DeletePhotoCommand}" x:Name="DeletePhotoButton" Content="Delete" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="10,10,0,0"/>
+                    <Button Command="{Binding OpenPhotoCommand}" x:Name="OpenPhotoButton" Content="Open" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="10,0,0,0"/>
+                    <Button IsEnabled="{Binding CanDeletePhoto}" Command="{Binding DeletePhotoCommand}" x:Name="DeletePhotoButton" Content="Delete" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="10,10,0,0"/>
                 </StackPanel>
                 <Label Grid.Row="0" Grid.Column="0" x:Name="PhotoLabel" Content="Photo" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,10,0,0" Grid.RowSpan="2"/>
 
@@ -78,11 +77,11 @@
             <Button x:Name="SaveButton" Content="Save" Width="75" Margin="10,20" Command="{Binding SaveCommand}"/>
         </StackPanel>
         <StackPanel HorizontalAlignment="Left" Height="65" Margin="10,10,0,0" VerticalAlignment="Top" Width="200" Grid.Row="1" Grid.Column="0">
-            <TextBox IsEnabled="{Binding NewEntry}" x:Name="SearchTextBox" Height="23" TextWrapping="Wrap" Margin="0,0,0,10" Text="{Binding SearchText}"/>
+            <TextBox IsEnabled="{Binding NewEntry}" x:Name="SearchTextBox" Height="23" TextWrapping="Wrap" Margin="0,0,0,10" Text="{Binding MainModel.SearchText}"/>
             <Button IsEnabled="{Binding NewEntry}"  x:Name="SearchButton" Content="SearchText" Height="30" Command="{Binding SearchCommand}"/>
         </StackPanel>
         <Button IsEnabled="{Binding NonNewEntry}" Grid.Row="0" Grid.Column="0"  x:Name="NewButton" Content="New" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75" Height="30" Command="{Binding NewCommand}"/>
-        <TabControl SelectionChanged="OnSelectionChanged" Visibility="{Binding EntrySelected, Converter={StaticResource BooleanToVisibilityConverter}}" SelectedItem="{Binding CurrentAddress}" ItemsSource="{Binding Addresses}" x:Name="tabControl" Grid.Column="1" HorizontalAlignment="Left" Height="341" Margin="10,0,0,0" Grid.Row="3" VerticalAlignment="Top" Width="760">
+        <TabControl SelectionChanged="OnSelectionChanged" Visibility="{Binding EntrySelected, Converter={StaticResource BooleanToVisibilityConverter}}" SelectedItem="{Binding MainModel.CurrentAddress}" ItemsSource="{Binding MainModel.Addresses}" x:Name="tabControl" Grid.Column="1" HorizontalAlignment="Left" Height="341" Margin="10,0,0,0" Grid.Row="3" VerticalAlignment="Top" Width="760">
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="Address" />
@@ -134,7 +133,7 @@
                 </DataTemplate>
             </TabControl.ContentTemplate>
         </TabControl>
-        <Button Grid.Row="0" x:Name="ExitButton" Content="Exit" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="75" Height="30" Grid.Column="1" Command="{Binding ExitCommand}"/>
+        <Button Grid.Row="0" x:Name="LogoutButton" Content="Logout" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="75" Height="30" Grid.Column="1" Command="{Binding LogoutCommand}"/>
         <Button Command="{Binding DeleteAddressCommand}" Visibility="{Binding EntrySelected, Converter={StaticResource BooleanToVisibilityConverter}}" Grid.Row="3" x:Name="DeleteAddressButton" Content="Delete" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Top" Width="75"/>
         <Button Visibility="{Binding EntrySelected, Converter={StaticResource BooleanToVisibilityConverter}}" Command="{Binding AddAddressCommand}" Grid.Row="3" x:Name="AddAddressButton" Content="Add" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,95,0" VerticalAlignment="Top" Width="75"/>
 

@@ -23,8 +23,6 @@ namespace AddressBook.Dto
 
         public string PhoneNumber2 { get; set; }
 
-        public string PhoneNumber3 { get; set; }
-
         public ICollection<AddressDto> Addresses { get; set; }
 
         public override string ToString()

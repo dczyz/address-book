@@ -1,6 +1,4 @@
-﻿using System;
-using System.Data.SqlServerCe;
-using System.Linq;
+﻿using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using AddressBook.Service;
@@ -11,6 +9,8 @@ namespace AddressBook.SignUp
 {
     class SignUpViewModel : ObservableObject, IPageViewModel
     {
+        public static readonly string Name = "SignUp";
+
         private ICommand _signUpCommand;
         private readonly INavigator _navigator;
         private string _username;
@@ -24,8 +24,6 @@ namespace AddressBook.SignUp
         {
             _navigator = navigator;
         }
-
-        public string Name => "SignUp";
 
         public void Init()
         {

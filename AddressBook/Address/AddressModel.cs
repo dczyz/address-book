@@ -3,7 +3,7 @@ using GalaSoft.MvvmLight;
 
 namespace AddressBook.Address
 {
-    class AddressViewModel : ObservableObject
+    class AddressModel : ObservableObject
     {
         private string _city;
         private string _postcode;
@@ -15,7 +15,7 @@ namespace AddressBook.Address
         private string _phonenumber3;
         private string _faxNumber;
 
-        public AddressViewModel(AddressDto address)
+        public AddressModel(AddressDto address)
         {
             City = address.City;
             Postcode = address.Postcode;

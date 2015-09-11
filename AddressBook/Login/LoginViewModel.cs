@@ -1,5 +1,7 @@
 ﻿using System.Windows.Input;
+using AddressBook.MainView;
 using AddressBook.Service;
+using AddressBook.SignUp;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 
@@ -7,6 +9,8 @@ namespace AddressBook.Login
 {
     class LoginViewModel : ObservableObject, IPageViewModel
     {
+        public static readonly string Name = "Login";
+
         private readonly INavigator _navigator;
         private ICommand _signUpCommand;
         private string _password;
@@ -19,18 +23,13 @@ namespace AddressBook.Login
             _navigator = navigator;
         }
 
-        public string Name => "Login";
-
-        public void Init()
-        {
-            
-        }
+        public void Init() { }
 
         public ICommand SignUpCommand
         {
             get
             {
-                _signUpCommand = _signUpCommand ?? new RelayCommand(() => _navigator.Navigate("SignUp"));
+                _signUpCommand = _signUpCommand ?? new RelayCommand(() => _navigator.Navigate(SignUpViewModel.Name));
                 return _signUpCommand;
             }
         }
@@ -48,7 +47,7 @@ namespace AddressBook.Login
         {
             if (ServiceLocator.UserService.Login(_username, _password))
             {
-                _navigator.Navigate("Main");
+                _navigator.Navigate(MainViewModel.Name);
                 return;
             }
             Error = true;

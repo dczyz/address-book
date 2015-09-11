@@ -7,53 +7,300 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using AddressBook.Address;
 using AddressBook.Dto;
+using AddressBook.Login;
 using AddressBook.Properties;
 using AddressBook.Service;
 using AddressBook.Session;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using Application = System.Windows.Application;
 
 namespace AddressBook.MainView
 {
     class MainViewModel : ObservableObject, IPageViewModel
     {
+        public readonly static string Name = "Main";
+
+        private readonly INavigator _navigator;
+
         private string _firstName;
         private string _secondName;
-        private DateTime _birthday;
         private string _phoneNumber1;
         private string _phoneNumber2;
         private string _searchText;
+        private DateTime _birthday;
         private BitmapImage _photo;
-        private ICommand _newCommand;
-        private ICommand _searchCommand;
-        private ICommand _exitCommand;
+        private EntryDto _selectedEntry;
+        private ObservableCollection<AddressModel> _addresses;
         private ObservableCollection<EntryDto> _entries;
         private ObservableCollection<EntryDto> _allEntries;
-        private ICommand _selectEntryCommand;
-        private EntryDto _selectedEntry;
-        private ICommand _saveCommand;
+
         private bool _nonNewEntry;
-        private ObservableCollection<AddressViewModel> _addresses;
+
+        private ICommand _newCommand;
+        private ICommand _searchCommand;
+        private ICommand _logoutCommand;
+        private ICommand _saveCommand;
         private ICommand _addAddressCommand;
-        private AddressViewModel _currentAddress;
         private ICommand _deleteAddressCommand;
-        private INavigator _navigator;
-        private int? _id;
-        private ICommand _loadPhotoCommand;
+        private ICommand _openPhotoCommand;
         private ICommand _cancelCommand;
         private ICommand _deleteCommand;
         private ICommand _deletePhotoCommand;
 
+        public MainViewModel(INavigator navigator)
+        {
+            _navigator = navigator;
+        }
+
         public void Init()
         {
-            _allEntries = new ObservableCollection<EntryDto>(ServiceLocator.AddressService.GetEntries(AppSession.UserId));
             NonNewEntry = true;
-            Birthday = DateTime.Now;
-            SearchText = string.Empty;
-            RaisePropertyChanged(() => EntrySelected);
+            AllEntries = new ObservableCollection<EntryDto>(ServiceLocator.AddressService.GetEntries(AppSession.UserId));
             Search();
         }
+
+        public ICommand NewCommand
+        {
+            get
+            {
+                _newCommand = _newCommand ?? new RelayCommand(New);
+                return _newCommand;
+            }
+        }
+
+        public ICommand SearchCommand
+        {
+            get
+            {
+                _searchCommand = _searchCommand ?? new RelayCommand(Search);
+                return _searchCommand;
+            }
+        }
+
+        public ICommand LogoutCommand
+        {
+            get
+            {
+                _logoutCommand = _logoutCommand ?? new RelayCommand(Exit);
+                return _logoutCommand;
+            }
+        }
+
+        public ICommand SaveCommand
+        {
+            get
+            {
+                _saveCommand = _saveCommand ?? new RelayCommand(Save);
+                return _saveCommand;
+            }
+        }
+
+        private void Save()
+        {
+            var entryDto = new EntryDto
+            {
+                Birthday = Birthday,
+                FirstName = FirstName,
+                PhoneNumber1 = PhoneNumber1,
+                PhoneNumber2 = PhoneNumber2,
+                SecondName = SecondName,
+                Addresses = new List<AddressDto>(),
+                Id = _selectedEntry?.Id
+            };
+            foreach (var addressDto in Addresses.Select(address => new AddressDto
+            {
+                PhoneNumber2 = address.PhoneNumber2,
+                City = address.City,
+                FaxNumber = address.FaxNumber,
+                FlatNumber = address.FlatNumber,
+                HomeNumber = address.HomeNumber,
+                Id = address.Id,
+                PhoneNumber1 = address.PhoneNumber1,
+                Postcode = address.Postcode,
+                Street = address.Street
+            }))
+            {
+                entryDto.Addresses.Add(addressDto);
+            }
+            if (entryDto.Id == null)
+            {
+                var entry = ServiceLocator.AddressService.SaveEntry(entryDto);
+                if (Photo != null && entry.Id != null)
+                {
+                    ServiceLocator.PhotoService.SavePhoto(Photo, entry.Id.Value);
+                }
+                AllEntries.Add(entry);
+                Entries.Add(entry);
+                SelectedEntry = entry;
+            }
+            else
+            {
+                var entry = ServiceLocator.AddressService.UpdateEntry(entryDto);
+                AllEntries[AllEntries.IndexOf(SelectedEntry)] = entry;
+                Entries[Entries.IndexOf(SelectedEntry)] = entry;
+                SelectedEntry = entry;
+                if (entry.Id != null)
+                {
+                    if (Photo != null)
+                    {
+                        ServiceLocator.PhotoService.SavePhoto(Photo, entry.Id.Value);
+                    }
+                    else
+                    {
+                        ServiceLocator.PhotoService.DeletePhoto(entry.Id.Value);
+                    }
+                }           
+            }
+            RaisePropertyChanged(() => Entries);
+            RaisePropertyChanged(() => SelectedEntry);
+            NonNewEntry = true;
+        }
+
+        private void Exit()
+        {
+            _navigator.Navigate(LoginViewModel.Name);
+        }
+
+        private void Search()
+        {
+            Entries = new ObservableCollection<EntryDto>(
+            AllEntries.Where(ae => ($"{ae.FirstName}{ae.SecondName}".ToLower()).Contains(SearchText.ToLower())));
+        }
+
+        private void New()
+        {
+            NonNewEntry = false;
+            SelectedEntry = null;
+            FirstName = string.Empty;
+            SecondName = string.Empty;
+            PhoneNumber1 = string.Empty;
+            PhoneNumber2 = string.Empty;
+            Photo = null;
+            Birthday = DateTime.Now;
+            Addresses = new ObservableCollection<AddressModel>();
+        }
+
+        public bool NonNewEntry
+        {
+            get { return _nonNewEntry; }
+            set
+            {
+                _nonNewEntry = value;
+                RaisePropertyChanged(() => NonNewEntry);
+                RaisePropertyChanged(() => EntrySelected);
+            }
+        }
+
+        public ICommand AddAddressCommand
+        {
+            get
+            {
+                _addAddressCommand = _addAddressCommand ?? new RelayCommand(AddAddress);
+                return _addAddressCommand;
+            }
+        }
+
+        private void AddAddress()
+        {
+            CurrentAddress = new AddressModel(new AddressDto());
+            Addresses.Add(CurrentAddress);
+        }
+
+        public ICommand DeleteAddressCommand
+        {
+            get
+            {
+                _deleteAddressCommand = _deleteAddressCommand ?? new RelayCommand(DeleteAddress);
+                return _deleteAddressCommand;
+            }
+        }
+
+        private void DeleteAddress()
+        {
+            DeleteCurrentAddress();
+        }
+
+        public bool EntrySelected => SelectedEntry != null || !NonNewEntry;
+
+        public ICommand OpenPhotoCommand
+        {
+            get
+            {
+                _openPhotoCommand = _openPhotoCommand ?? new RelayCommand(OpenPhoto);
+                return _openPhotoCommand;
+            }
+        }
+
+        private void OpenPhoto()
+        {
+            var openFileDialog = new OpenFileDialog
+            {
+                InitialDirectory = "c:\\",
+                Filter = Resources.PhotoImageFormat,
+                FilterIndex = 1,
+                CheckFileExists = true
+            };
+
+
+            if (openFileDialog.ShowDialog() != DialogResult.OK) return;
+            var image = new BitmapImage();
+            image.BeginInit();
+            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.UriSource = new Uri(openFileDialog.FileName);
+            image.EndInit();
+            Photo = image;
+        }
+
+        public ICommand CancelCommand
+        {
+            get
+            {
+                _cancelCommand = _cancelCommand ?? new RelayCommand(Cancel);
+                return _cancelCommand;
+            }
+        }
+
+        private void Cancel()
+        {
+            NonNewEntry = true;
+            SelectedEntry = SelectedEntry;
+        }
+
+        public ICommand DeleteCommand
+        {
+            get
+            {
+                _deleteCommand = _deleteCommand ?? new RelayCommand(Delete);
+                return _deleteCommand;
+            }
+        }
+
+        private void Delete()
+        {
+            if (_selectedEntry.Id != null)
+            {
+                ServiceLocator.AddressService.DeleteEntry(_selectedEntry.Id.Value);
+            }
+            AllEntries.Remove(SelectedEntry);
+            Entries.Remove(SelectedEntry);
+            SelectedEntry = null;
+        }
+
+        public ICommand DeletePhotoCommand
+        {
+            get
+            {
+                _deletePhotoCommand = _deletePhotoCommand ?? new RelayCommand(DeletePhoto);
+                return _deletePhotoCommand;
+            }
+        }
+
+        private void DeletePhoto()
+        {
+            Photo = null;
+        }
+
+        public bool CanDeletePhoto => Photo != null;
 
         public string FirstName
         {
@@ -125,180 +372,7 @@ namespace AddressBook.MainView
             }
         }
 
-        public ICommand NewCommand
-        {
-            get
-            {
-                _newCommand = _newCommand ?? new RelayCommand(New);
-                return _newCommand;
-            }
-        }
-
-        public ICommand SearchCommand
-        {
-            get
-            {
-                _searchCommand = _searchCommand ?? new RelayCommand(Search);
-                return _searchCommand;
-            }
-        }
-
-        public ICommand ExitCommand
-        {
-            get
-            {
-                _exitCommand = _exitCommand ?? new RelayCommand(Exit);
-                return _exitCommand;
-            }
-        }
-
-        public ObservableCollection<EntryDto> Entries
-        {
-            get { return _entries; }
-            set
-            {
-                _entries = value;
-                RaisePropertyChanged(() => Entries);
-            }
-        }
-
-        public EntryDto SelectedEntry
-        {
-            get
-            {
-                return _selectedEntry;
-            }
-            set
-            {
-                _selectedEntry = value;
-                if (_selectedEntry == null)
-                {
-                    RaisePropertyChanged(() => EntrySelected);
-                    return;
-                }
-                FirstName = _selectedEntry.FirstName;
-                SecondName = _selectedEntry.SecondName;
-                PhoneNumber1 = _selectedEntry.PhoneNumber1;
-                PhoneNumber2 = _selectedEntry.PhoneNumber2;
-                Photo = _selectedEntry.Id != null ? ServiceLocator.PhotoService.GetPhoto(_selectedEntry.Id.Value) : null;
-                Birthday = _selectedEntry.Birthday;
-                Addresses = new ObservableCollection<AddressViewModel>();
-                _id = _selectedEntry.Id;
-                foreach (var address in _selectedEntry.Addresses)
-                {
-                    Addresses.Add(new AddressViewModel(address));
-                }
-                CurrentAddress = Addresses.FirstOrDefault();
-                RaisePropertyChanged(() => SelectedEntry);
-                RaisePropertyChanged(() => EntrySelected);
-            }
-        }
-
-        public ICommand SaveCommand
-        {
-            get
-            {
-                _saveCommand = _saveCommand ?? new RelayCommand(Save);
-                return _saveCommand;
-            }
-        }
-
-        private void Save()
-        {
-            var entryDto = new EntryDto
-            {
-                Birthday = Birthday,
-                FirstName = FirstName,
-                PhoneNumber1 = PhoneNumber1,
-                PhoneNumber2 = PhoneNumber2,
-                SecondName = SecondName,
-                Addresses = new List<AddressDto>(),
-                Id = _id
-            };
-            foreach (var addressDto in _addresses.Select(address => new AddressDto
-            {
-                PhoneNumber2 = address.PhoneNumber2,
-                City = address.City,
-                FaxNumber = address.FaxNumber,
-                FlatNumber = address.FlatNumber,
-                HomeNumber = address.HomeNumber,
-                Id = address.Id,
-                PhoneNumber1 = address.PhoneNumber1,
-                Postcode = address.Postcode,
-                Street = address.Street
-            }))
-            {
-                entryDto.Addresses.Add(addressDto);
-            }
-            if (entryDto.Id == null)
-            {
-                var entry = ServiceLocator.AddressService.SaveEntry(entryDto);
-                if (Photo != null)
-                {
-                    ServiceLocator.PhotoService.SavePhoto(Photo, entry.Id.Value);
-                }
-                _allEntries.Add(entry);
-                Entries.Add(entry);
-                SelectedEntry = entry;
-            }
-            else
-            {
-                var entry = ServiceLocator.AddressService.UpdateEntry(entryDto);
-                _allEntries[_allEntries.IndexOf(SelectedEntry)] = entry;
-                Entries[Entries.IndexOf(SelectedEntry)] = entry;
-                SelectedEntry = entry;
-                if (Photo != null)
-                {
-                    ServiceLocator.PhotoService.SavePhoto(Photo, SelectedEntry.Id.Value);
-                }
-                else
-                {
-                    ServiceLocator.PhotoService.DeletePhoto(_id.Value);
-                }
-                RaisePropertyChanged(() => Entries);
-                RaisePropertyChanged(() => SelectedEntry);
-            }
-            NonNewEntry = true;
-        }
-
-        private static void Exit()
-        {
-            Application.Current.Shutdown();
-        }
-
-        private void Search()
-        {
-            Entries = new ObservableCollection<EntryDto>(
-                _allEntries.Where(ae => ($"{ae.FirstName}{ae.SecondName}".ToLower()).Contains(SearchText.ToLower())));
-        }
-
-        private void New()
-        {
-            _id = null;
-            NonNewEntry = false;
-            SelectedEntry = null;
-            FirstName = string.Empty;
-            SecondName = string.Empty;
-            PhoneNumber1 = string.Empty;
-            PhoneNumber2 = string.Empty;
-            Photo = null;
-            Birthday = DateTime.Now;
-            Addresses = new ObservableCollection<AddressViewModel>();
-        }
-
-        public bool NonNewEntry
-        {
-            get { return _nonNewEntry; }
-            set
-            {
-                _nonNewEntry = value;
-                RaisePropertyChanged(() => NonNewEntry);
-                RaisePropertyChanged(() => EntrySelected);
-            }
-        }
-
-
-        public ObservableCollection<AddressViewModel> Addresses
+        public ObservableCollection<AddressModel> Addresses
         {
             get
             {
@@ -311,42 +385,9 @@ namespace AddressBook.MainView
             }
         }
 
-        public ICommand AddAddressCommand
-        {
-            get
-            {
-                _addAddressCommand = _addAddressCommand ?? new RelayCommand(AddAddress);
-                return _addAddressCommand;
-            }
-        }
+        public AddressModel CurrentAddress { get; set; }
 
-        private void AddAddress()
-        {
-            var address = new AddressViewModel(new AddressDto());
-            Addresses.Add(address);
-            CurrentAddress = address;
-        }
-
-        public ICommand DeleteAddressCommand
-        {
-            get
-            {
-                _deleteAddressCommand = _deleteAddressCommand ?? new RelayCommand(DeleteAddress);
-                return _deleteAddressCommand;
-            }
-        }
-
-        public AddressViewModel CurrentAddress
-        {
-            get { return _currentAddress; }
-            set
-            {
-                _currentAddress = value;
-                RaisePropertyChanged(() => CurrentAddress);
-            }
-        }
-
-        private void DeleteAddress()
+        public void DeleteCurrentAddress()
         {
             if (Addresses.Count > 1)
             {
@@ -361,83 +402,61 @@ namespace AddressBook.MainView
             }
         }
 
-        public string Name => "Main";
-
-        public bool EntrySelected => SelectedEntry != null || !NonNewEntry;
-
-        public ICommand LoadPhotoCommand
+        public EntryDto SelectedEntry
         {
             get
             {
-                _loadPhotoCommand = _loadPhotoCommand ?? new RelayCommand(LoadPhoto);
-                return _loadPhotoCommand;
+                return _selectedEntry;
+            }
+            set
+            {
+                _selectedEntry = value;
+                if (_selectedEntry != null)
+                {
+                    LoadEntryData();
+                }
+                RaisePropertyChanged(() => SelectedEntry);
             }
         }
 
-        private void LoadPhoto()
+        private void LoadEntryData()
         {
-            var openFileDialog = new OpenFileDialog
-            {
-                InitialDirectory = "c:\\",
-                Filter = Resources.PhotoImageFormat,
-                FilterIndex = 1,
-                CheckFileExists = true
-            };
-
-
-            if (openFileDialog.ShowDialog() != DialogResult.OK) return;
-            var image = new BitmapImage();
-            image.BeginInit();
-            image.CacheOption = BitmapCacheOption.OnLoad;
-            image.UriSource = new Uri(openFileDialog.FileName);
-            image.EndInit();
-            Photo = image;
+            FirstName = _selectedEntry.FirstName;
+            SecondName = _selectedEntry.SecondName;
+            PhoneNumber1 = _selectedEntry.PhoneNumber1;
+            PhoneNumber2 = _selectedEntry.PhoneNumber2;
+            Birthday = _selectedEntry.Birthday;
+            LoadAddresses();
         }
 
-        public ICommand CancelCommand 
+        public ObservableCollection<EntryDto> AllEntries
         {
-            get
+            get { return _allEntries; }
+            set
             {
-                _cancelCommand = _cancelCommand ?? new RelayCommand(Cancel);
-                return _cancelCommand;
+                _allEntries = value;
+                RaisePropertyChanged(() => AllEntries);
             }
         }
 
-        private void Cancel()
+        public ObservableCollection<EntryDto> Entries
         {
-            NonNewEntry = true;
-            SelectedEntry = SelectedEntry;
-        }
-
-        public ICommand DeleteCommand
-        {
-            get
+            get { return _entries; }
+            set
             {
-                _deleteCommand = _deleteCommand ?? new RelayCommand(Delete);
-                return _deleteCommand;
+                _entries = value;
+                RaisePropertyChanged(() => Entries);
             }
         }
 
-        private void Delete()
+        private void LoadAddresses()
         {
-            ServiceLocator.AddressService.DeleteEntry(_id.Value);
-            _allEntries.Remove(SelectedEntry);
-            Entries.Remove(SelectedEntry);
-            SelectedEntry = null;
-        }
-
-        public ICommand DeletePhotoCommand
-        {
-            get
+            Addresses = new ObservableCollection<AddressModel>();
+            foreach (var address in _selectedEntry.Addresses)
             {
-                _deletePhotoCommand = _deletePhotoCommand ?? new RelayCommand(DeletePhoto);
-                return _deletePhotoCommand;;
+                Addresses.Add(new AddressModel(address));
             }
-        }
-
-        private void DeletePhoto()
-        {
-            Photo = null;
+            CurrentAddress = Addresses.FirstOrDefault();
         }
     }
 }
