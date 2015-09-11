@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using AddressBook.Service;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
@@ -13,7 +12,7 @@ namespace AddressBook.Login
         private string _password;
         private ICommand _loginCommand;
         private string _username;
-        private bool _showError;
+        private bool _error;
 
         public LoginViewModel(INavigator navigator)
         {
@@ -52,16 +51,16 @@ namespace AddressBook.Login
                 _navigator.Navigate("Main");
                 return;
             }
-            ShowError = true;
+            Error = true;
         }
 
-        public bool ShowError
+        public bool Error
         {
-            get { return _showError; }
+            get { return _error; }
             set
             {
-                _showError = value;
-                RaisePropertyChanged(() => ShowError);
+                _error = value;
+                RaisePropertyChanged(() => Error);
             }
         }
 

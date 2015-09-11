@@ -114,7 +114,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="MainViewModel_LoadPhoto_Image_Files____bmp___jpg___jpeg___png____BMP___JPG___JPEG___PNG" xml:space="preserve">
+  <data name="PhotoImageFormat" xml:space="preserve">
     <value>Image Files (*.bmp;*.jpg;*.jpeg,*.png)|*.BMP;*.JPG;*.JPEG;*.PNG</value>
   </data>
 </root>

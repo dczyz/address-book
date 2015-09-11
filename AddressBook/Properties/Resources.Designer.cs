@@ -63,10 +63,9 @@ namespace AddressBook.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Image Files (*.bmp;*.jpg;*.jpeg,*.png)|*.BMP;*.JPG;*.JPEG;*.PNG.
         /// </summary>
-        internal static string MainViewModel_LoadPhoto_Image_Files____bmp___jpg___jpeg___png____BMP___JPG___JPEG___PNG {
+        internal static string PhotoImageFormat {
             get {
-                return ResourceManager.GetString("MainViewModel_LoadPhoto_Image_Files____bmp___jpg___jpeg___png____BMP___JPG___JPEG" +
-                        "___PNG", resourceCulture);
+                return ResourceManager.GetString("PhotoImageFormat", resourceCulture);
             }
         }
     }

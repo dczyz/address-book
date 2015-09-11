@@ -233,7 +233,6 @@ namespace AddressBook.MainView
             if (entryDto.Id == null)
             {
                 var entry = ServiceLocator.AddressService.SaveEntry(entryDto);
-                _allEntries.Add(entry);
                 if (Photo != null)
                 {
                     ServiceLocator.PhotoService.SavePhoto(Photo, entry.Id.Value);
@@ -245,7 +244,9 @@ namespace AddressBook.MainView
             else
             {
                 var entry = ServiceLocator.AddressService.UpdateEntry(entryDto);
-                SelectedEntry.Id = entry.Id;
+                _allEntries[_allEntries.IndexOf(SelectedEntry)] = entry;
+                Entries[Entries.IndexOf(SelectedEntry)] = entry;
+                SelectedEntry = entry;
                 if (Photo != null)
                 {
                     ServiceLocator.PhotoService.SavePhoto(Photo, SelectedEntry.Id.Value);
@@ -254,8 +255,10 @@ namespace AddressBook.MainView
                 {
                     ServiceLocator.PhotoService.DeletePhoto(_id.Value);
                 }
+                RaisePropertyChanged(() => Entries);
                 RaisePropertyChanged(() => SelectedEntry);
             }
+            NonNewEntry = true;
         }
 
         private static void Exit()
@@ -271,6 +274,7 @@ namespace AddressBook.MainView
 
         private void New()
         {
+            _id = null;
             NonNewEntry = false;
             SelectedEntry = null;
             FirstName = string.Empty;
@@ -375,7 +379,7 @@ namespace AddressBook.MainView
             var openFileDialog = new OpenFileDialog
             {
                 InitialDirectory = "c:\\",
-                Filter = Resources.MainViewModel_LoadPhoto_Image_Files____bmp___jpg___jpeg___png____BMP___JPG___JPEG___PNG,
+                Filter = Resources.PhotoImageFormat,
                 FilterIndex = 1,
                 CheckFileExists = true
             };

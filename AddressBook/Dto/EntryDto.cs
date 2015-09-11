@@ -29,7 +29,7 @@ namespace AddressBook.Dto
 
         public override string ToString()
         {
-            return $"{FirstName} {SecondName}";
+            return $"{SecondName} {FirstName}";
         }
     }
 }

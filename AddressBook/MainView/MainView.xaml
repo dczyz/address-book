@@ -4,11 +4,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mainView="clr-namespace:AddressBook.MainView"
+             xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              mc:Ignorable="d" 
              Height="650"
              Width="1000" Background="White">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <CollectionViewSource x:Key="cvs" Source="{Binding Entries}">
+            <CollectionViewSource.SortDescriptions>
+                <componentModel:SortDescription PropertyName="SecondName" Direction="Ascending"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -22,7 +28,7 @@
             <RowDefinition Height="341"/>
             <RowDefinition Height="71"/>
         </Grid.RowDefinitions>
-        <ListBox IsEnabled="{Binding NonNewEntry}" ItemsSource="{Binding Entries}" x:Name="EntriesListBox" HorizontalAlignment="Left" Height="505" Margin="10,0,0,0" Grid.Row="2" Grid.RowSpan="3"
+        <ListBox IsEnabled="{Binding NonNewEntry}" ItemsSource="{Binding Source={StaticResource cvs}}" x:Name="EntriesListBox" HorizontalAlignment="Left" Height="505" Margin="10,0,0,0" Grid.Row="2" Grid.RowSpan="3"
                  Grid.Column="0" VerticalAlignment="Top" Width="200" SelectedItem="{Binding SelectedEntry}">
         </ListBox>
         <Grid Visibility="{Binding EntrySelected, Converter={StaticResource BooleanToVisibilityConverter}}" Grid.Column="1" HorizontalAlignment="Left" Height="186" Grid.Row="1" Grid.RowSpan="2" VerticalAlignment="Top" Width="780">

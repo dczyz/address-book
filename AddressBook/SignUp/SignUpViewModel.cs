@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.SqlServerCe;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using AddressBook.Service;
 using GalaSoft.MvvmLight;
@@ -14,7 +15,7 @@ namespace AddressBook.SignUp
         private readonly INavigator _navigator;
         private string _username;
         private string _password;
-        private bool _showError;
+        private bool _error;
         private string _confirmPassword;
         private ICommand _backToLoginCommand;
         private string _errorText;
@@ -45,7 +46,7 @@ namespace AddressBook.SignUp
             if (!Validate()) return;
             if (ServiceLocator.UserService.SignUp(_username, _password))
             {
-                //TODO pokaż coś
+                MessageBox.Show("You have been successfully signed up", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
             ShowError("User with given username already exists");
@@ -53,9 +54,14 @@ namespace AddressBook.SignUp
 
         private bool Validate()
         {
-            if(Username == null || Username.Length < 6 || Username.Any(char.IsWhiteSpace))
+            if(Username == null || Username.Length < 3 || Username.Any(char.IsWhiteSpace))
             {
-                ShowError("Username must have at least 6 no-whitespace characters");
+                ShowError("Username must have at least 3 no-whitespace characters");
+                return false;
+            }
+            if (Password == null || Password.Length < 6 || Password.Any(char.IsWhiteSpace))
+            {
+                ShowError("Password must have at least 6 no-whitespace characters");
                 return false;
             }
             if (Password != ConfirmPassword)
@@ -107,11 +113,11 @@ namespace AddressBook.SignUp
         {
             get
             {
-                return _showError;
+                return _error;
             }
             set
             {
-                _showError = value;
+                _error = value;
                 RaisePropertyChanged(() => Error);
             }
         }
