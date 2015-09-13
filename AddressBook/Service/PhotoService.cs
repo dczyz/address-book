@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Media.Imaging;
+using static System.IO.FileMode;
 
 namespace AddressBook.Service
 {
@@ -30,7 +31,7 @@ namespace AddressBook.Service
             DeleteFileIfExists(photoPath);
             var encoder = new JpegBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(photo));
-            using (var filestream =new FileStream(photoPath, FileMode.Create))
+            using (var filestream = new FileStream(photoPath, Create))
             {
                 encoder.Save(filestream);
             }

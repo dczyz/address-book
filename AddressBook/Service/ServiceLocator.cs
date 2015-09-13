@@ -2,10 +2,10 @@
 {
     static class ServiceLocator
     {
-        public static UserService UserService = new UserService();
+        public static readonly UserService UserService = new UserService();
 
-        public static AddressService AddressService = new AddressService();
+        public static readonly AddressService AddressService = new AddressService();
 
-        public static PhotoService PhotoService = new PhotoService();
+        public static readonly PhotoService PhotoService = new PhotoService();
     }
 }

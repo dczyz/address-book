@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
+using AddressBook.Application;
 using AddressBook.Database;
 using AddressBook.Entity;
 using AddressBook.Model;
-using AddressBook.Session;
-using AutoMapper;
+using static AutoMapper.Mapper;
 
 namespace AddressBook.Service
 {
@@ -39,17 +37,26 @@ namespace AddressBook.Service
             {
                 var entry = MapToEntry(entryModel);
                 entry.UserId = AppSession.UserId;
-                var existingEntry = db.Entries.FirstOrDefault(e => e.Id == entry.Id);
-                var addressesToDelete = existingEntry.Addresses.Where(address => entry.Addresses.All(a => a.Id != address.Id)).ToList();
+                DeleteAddresses(db, entry);
+                db.Entries.AddOrUpdate(entry);
+                db.SaveChanges();
+                return MapToEntryDto(entry);
+            }
+        }
+
+        private static void DeleteAddresses(DatabaseContext db, Entry entry)
+        {
+            var existingEntry = db.Entries.FirstOrDefault(e => e.Id == entry.Id);
+            if (existingEntry != null)
+            {
+                var addressesToDelete =
+                    existingEntry.Addresses.Where(address => entry.Addresses.All(a => a.Id != address.Id)).ToList();
                 foreach (var address in entry.Addresses)
                 {
                     address.Entry = existingEntry;
                     db.Addresses.AddOrUpdate(address);
                 }
                 db.Addresses.RemoveRange(addressesToDelete);
-                db.Entries.AddOrUpdate(entry);
-                db.SaveChanges();
-                return MapToEntryDto(entry);
             }
         }
 
@@ -58,6 +65,7 @@ namespace AddressBook.Service
             using (var db = new DatabaseContext())
             {
                 var entry = db.Entries.FirstOrDefault(e => e.Id == entryId);
+                if (entry == null) return;
                 db.Addresses.RemoveRange(entry.Addresses);
                 db.Entries.Remove(entry);
                 db.SaveChanges();
@@ -66,12 +74,12 @@ namespace AddressBook.Service
 
         private static EntryModel MapToEntryDto(Entry entry)
         {
-            return Mapper.Map<EntryModel>(entry);
+            return Map<EntryModel>(entry);
         }
 
         private static Entry MapToEntry(EntryModel entryModel)
         {
-            return Mapper.Map<Entry>(entryModel);
+            return Map<Entry>(entryModel);
         }
     }
 }

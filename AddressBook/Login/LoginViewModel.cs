@@ -1,5 +1,6 @@
 ﻿using System.Windows.Input;
 using AddressBook.MainView;
+using AddressBook.Model;
 using AddressBook.Service;
 using AddressBook.SignUp;
 using GalaSoft.MvvmLight;
@@ -45,7 +46,7 @@ namespace AddressBook.Login
 
         private void Login()
         {
-            if (ServiceLocator.UserService.Login(_username, _password))
+            if (ServiceLocator.UserService.Login(new LoginModel(_username, _password)))
             {
                 _navigator.Navigate(MainViewModel.Name);
                 return;

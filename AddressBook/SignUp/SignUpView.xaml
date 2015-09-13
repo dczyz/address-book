@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:addressBook="clr-namespace:AddressBook"
+             xmlns:util="clr-namespace:AddressBook.Util"
              mc:Ignorable="d" 
               Height="330" Width="400">
     <UserControl.Resources>
@@ -18,16 +18,16 @@
                 </TextBox.InputBindings>
             </TextBox>
             <Label x:Name="PasswordLabel" Content="Password" HorizontalAlignment="Center"/>
-            <PasswordBox MaxLength="255" x:Name="PasswordPasswordBox" Height="23" addressBook:PasswordHelper.Attach="True" 
-                   addressBook:PasswordHelper.Password="{Binding Text, ElementName=plainPassword, Mode=TwoWay}" Margin="0,0,0,10" Width="250">
+            <PasswordBox MaxLength="255" x:Name="PasswordPasswordBox" Height="23" util:PasswordHelper.Attach="True" 
+                   util:PasswordHelper.Password="{Binding Text, ElementName=plainPassword, Mode=TwoWay}" Margin="0,0,0,10" Width="250">
                 <PasswordBox.InputBindings>
                     <KeyBinding Key="Enter" Command="{Binding SignUpCommand}" />
                 </PasswordBox.InputBindings>
             </PasswordBox>
             <TextBlock Name="plainPassword" Height="0" Foreground="Transparent" Visibility="Hidden" Text="{Binding Password, Mode=TwoWay}" />
             <Label x:Name="ConfirmPasswordLabel" Content="Confirm password" HorizontalAlignment="Center"/>
-            <PasswordBox MaxLength="255" x:Name="ConfirmPasswordPasswordBox" Height="23" addressBook:PasswordHelper.Attach="True" 
-                   addressBook:PasswordHelper.Password="{Binding Text, ElementName=plainConfirmPassword, Mode=TwoWay}" Margin="0,0,0,10" Width="250">
+            <PasswordBox MaxLength="255" x:Name="ConfirmPasswordPasswordBox" Height="23" util:PasswordHelper.Attach="True" 
+                   util:PasswordHelper.Password="{Binding Text, ElementName=plainConfirmPassword, Mode=TwoWay}" Margin="0,0,0,10" Width="250">
                 <PasswordBox.InputBindings>
                     <KeyBinding Key="Enter" Command="{Binding SignUpCommand}" />
                 </PasswordBox.InputBindings>

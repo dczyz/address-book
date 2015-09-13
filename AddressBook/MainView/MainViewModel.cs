@@ -8,11 +8,13 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using AddressBook.Login;
 using AddressBook.Model;
-using AddressBook.Properties;
 using AddressBook.Service;
 using AddressBook.Session;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using static System.Windows.Forms.DialogResult;
+using static System.Windows.Media.Imaging.BitmapCacheOption;
+using static AddressBook.Properties.Resources;
 using MessageBox = System.Windows.MessageBox;
 
 namespace AddressBook.MainView
@@ -269,16 +271,16 @@ namespace AddressBook.MainView
             var openFileDialog = new OpenFileDialog
             {
                 InitialDirectory = InitialPhotoDirectory,
-                Filter = Resources.PhotoImageFormat,
+                Filter = PhotoImageFormat,
                 FilterIndex = 1,
                 CheckFileExists = true
             };
 
 
-            if (openFileDialog.ShowDialog() != DialogResult.OK) return;
+            if (openFileDialog.ShowDialog() != OK) return;
             var image = new BitmapImage();
             image.BeginInit();
-            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.CacheOption = OnLoad;
             image.UriSource = new Uri(openFileDialog.FileName);
             image.EndInit();
             Photo = image;

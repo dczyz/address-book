@@ -1,9 +1,13 @@
 ﻿using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using AddressBook.Login;
+using AddressBook.Model;
 using AddressBook.Service;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using static System.Windows.MessageBoxButton;
+using static System.Windows.MessageBoxImage;
 
 namespace AddressBook.SignUp
 {
@@ -42,9 +46,9 @@ namespace AddressBook.SignUp
         private void SignUp()
         {
             if (!Validate()) return;
-            if (ServiceLocator.UserService.SignUp(_username, _password))
+            if (ServiceLocator.UserService.SignUp(new LoginModel(_username, _password)))
             {
-                MessageBox.Show("You have been successfully signed up", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("You have been successfully signed up", "Information", OK, Information);
                 return;
             }
             ShowError("User with given username already exists");
@@ -131,7 +135,7 @@ namespace AddressBook.SignUp
 
         private void BackToLogin()
         {
-            _navigator.Navigate("Login");
+            _navigator.Navigate(LoginViewModel.Name);
         }
 
         public string ErrorText

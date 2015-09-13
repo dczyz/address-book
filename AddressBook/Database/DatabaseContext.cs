@@ -9,6 +9,6 @@ namespace AddressBook.Database
 
         public DbSet<Entry> Entries { get; set; }
 
-        public DbSet<Entity.Address> Addresses{ get; set; }
+        public DbSet<Address> Addresses{ get; set; }
     }
 }
