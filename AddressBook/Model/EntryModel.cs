@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using AddressBook.Entity;
 
-namespace AddressBook.Dto
+namespace AddressBook.Model
 {
-    class EntryDto
+    class EntryModel
     {
-        public EntryDto()
+        public EntryModel()
         {
-            Addresses = new List<AddressDto>();
+            Addresses = new List<AddressModel>();
         }
 
         public int? Id { get; set; }
@@ -23,7 +22,7 @@ namespace AddressBook.Dto
 
         public string PhoneNumber2 { get; set; }
 
-        public ICollection<AddressDto> Addresses { get; set; }
+        public ICollection<AddressModel> Addresses { get; set; }
 
         public override string ToString()
         {

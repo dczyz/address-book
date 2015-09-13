@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Windows;
+using AddressBook.Service;
 
 namespace AddressBook
 {
@@ -20,6 +21,7 @@ namespace AddressBook
             var context = new ApplicationViewModel();
             app.DataContext = context;
             MapperConfiguration.Configure();
+            ServiceLocator.PhotoService.CreatePhotoDirectoryPathIfNotExists();
             app.Show();
         }
     }

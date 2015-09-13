@@ -98,10 +98,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Address\AddressModel.cs" />
     <Compile Include="ApplicationViewModel.cs" />
-    <Compile Include="Dto\AddressDto.cs" />
-    <Compile Include="Dto\EntryDto.cs" />
+    <Compile Include="Model\AddressModel.cs" />
+    <Compile Include="Model\EntryModel.cs" />
     <Compile Include="Entity\Address.cs" />
     <Compile Include="Entity\BaseEntity.cs" />
     <Compile Include="Entity\Entry.cs" />
@@ -109,7 +108,6 @@
     <Compile Include="Login\LoginView.xaml.cs">
       <DependentUpon>LoginView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MainView\MainModel.cs" />
     <Compile Include="MainView\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
@@ -131,6 +129,7 @@
     <Compile Include="ApplicationView.xaml.cs">
       <DependentUpon>ApplicationView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="StringExtension.cs" />
     <Page Include="Login\LoginView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -1,5 +1,5 @@
-﻿using AddressBook.Dto;
-using AddressBook.Entity;
+﻿using AddressBook.Entity;
+using AddressBook.Model;
 using AutoMapper;
 
 namespace AddressBook
@@ -8,12 +8,12 @@ namespace AddressBook
     {
         public static void Configure()
         {
-            Mapper.CreateMap<Entity.Address, AddressDto>();
-            Mapper.CreateMap<AddressDto, Entity.Address>()
+            Mapper.CreateMap<Entity.Address, AddressModel>();
+            Mapper.CreateMap<AddressModel, Entity.Address>()
                 .ForMember(d => d.Entry, o => o.Ignore());
 
-            Mapper.CreateMap<Entry, EntryDto>();
-            Mapper.CreateMap<EntryDto, Entry>();
+            Mapper.CreateMap<Entry, EntryModel>();
+            Mapper.CreateMap<EntryModel, Entry>();
         }
     }
 }

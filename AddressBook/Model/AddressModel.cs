@@ -1,9 +1,9 @@
-﻿using AddressBook.Dto;
+﻿using System;
 using GalaSoft.MvvmLight;
 
-namespace AddressBook.Address
+namespace AddressBook.Model
 {
-    class AddressModel : ObservableObject
+    class AddressModel : ObservableObject, ICloneable
     {
         private string _city;
         private string _postcode;
@@ -14,20 +14,6 @@ namespace AddressBook.Address
         private string _phonenumber2;
         private string _phonenumber3;
         private string _faxNumber;
-
-        public AddressModel(AddressDto address)
-        {
-            City = address.City;
-            Postcode = address.Postcode;
-            Street = address.Street;
-            PhoneNumber1 = address.PhoneNumber1;
-            PhoneNumber2 = address.PhoneNumber2;
-            PhoneNumber3 = address.PhoneNumber3;
-            FlatNumber = address.FlatNumber;
-            FaxNumber = address.FaxNumber;
-            HomeNumber = address.HomeNumber;
-            Id = address.Id;
-        }
 
         public string City
         {
@@ -132,5 +118,10 @@ namespace AddressBook.Address
         }
 
         public int? Id { get; set; }
+
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
     }
 }

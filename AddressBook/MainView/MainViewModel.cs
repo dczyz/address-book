@@ -2,23 +2,25 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using AddressBook.Address;
-using AddressBook.Dto;
 using AddressBook.Login;
+using AddressBook.Model;
 using AddressBook.Properties;
 using AddressBook.Service;
 using AddressBook.Session;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using MessageBox = System.Windows.MessageBox;
 
 namespace AddressBook.MainView
 {
     class MainViewModel : ObservableObject, IPageViewModel
     {
         public readonly static string Name = "Main";
+        private const string InitialPhotoDirectory = "c:\\";
 
         private readonly INavigator _navigator;
 
@@ -29,10 +31,10 @@ namespace AddressBook.MainView
         private string _searchText;
         private DateTime _birthday;
         private BitmapImage _photo;
-        private EntryDto _selectedEntry;
+        private EntryModel _selectedEntry;
         private ObservableCollection<AddressModel> _addresses;
-        private ObservableCollection<EntryDto> _entries;
-        private ObservableCollection<EntryDto> _allEntries;
+        private ObservableCollection<EntryModel> _entries;
+        private ObservableCollection<EntryModel> _allEntries;
 
         private bool _nonNewEntry;
 
@@ -46,6 +48,7 @@ namespace AddressBook.MainView
         private ICommand _cancelCommand;
         private ICommand _deleteCommand;
         private ICommand _deletePhotoCommand;
+        private AddressModel _currentAddress;
 
         public MainViewModel(INavigator navigator)
         {
@@ -55,7 +58,8 @@ namespace AddressBook.MainView
         public void Init()
         {
             NonNewEntry = true;
-            AllEntries = new ObservableCollection<EntryDto>(ServiceLocator.AddressService.GetEntries(AppSession.UserId));
+            SearchText = string.Empty;
+            AllEntries = new ObservableCollection<EntryModel>(ServiceLocator.AddressService.GetEntries(AppSession.UserId));
             Search();
         }
 
@@ -81,7 +85,7 @@ namespace AddressBook.MainView
         {
             get
             {
-                _logoutCommand = _logoutCommand ?? new RelayCommand(Exit);
+                _logoutCommand = _logoutCommand ?? new RelayCommand(Logout);
                 return _logoutCommand;
             }
         }
@@ -97,17 +101,77 @@ namespace AddressBook.MainView
 
         private void Save()
         {
-            var entryDto = new EntryDto
+            if (Validate())
+            {
+                var entryModel = CreateEntryModel();
+                if (entryModel.Id == null)
+                {
+                    AddNewEntry(entryModel);
+                }
+                else
+                {
+                    UpdateEntry(entryModel);
+                }
+                RaisePropertyChanged(() => Entries);
+                RaisePropertyChanged(() => SelectedEntry);
+                NonNewEntry = true;
+                MessageBox.Show("Data has been successfully saved", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show("Mandatory data missing", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void UpdateEntry(EntryModel entryModel)
+        {
+            var entry = ServiceLocator.AddressService.UpdateEntry(entryModel);
+            if (entry.Id == null) return;
+            var entryId = entry.Id.Value;
+            if (Photo != null)
+            {
+                ServiceLocator.PhotoService.SavePhoto(Photo, entryId);
+            }
+            else
+            {
+                ServiceLocator.PhotoService.DeletePhoto(entryId);
+            }
+            AllEntries[AllEntries.IndexOf(SelectedEntry)] = entry;
+            Entries[Entries.IndexOf(SelectedEntry)] = entry;
+            SelectedEntry = entry;
+        }
+
+        private void AddNewEntry(EntryModel entryModel)
+        {
+            var entry = ServiceLocator.AddressService.SaveEntry(entryModel);
+            if (Photo != null && entry.Id != null)
+            {
+                ServiceLocator.PhotoService.SavePhoto(Photo, entry.Id.Value);
+            }
+            AllEntries.Add(entry);
+            Entries.Add(entry);
+            SelectedEntry = entry;
+        }
+
+        private EntryModel CreateEntryModel()
+        {
+            var entryModel = new EntryModel
             {
                 Birthday = Birthday,
                 FirstName = FirstName,
                 PhoneNumber1 = PhoneNumber1,
                 PhoneNumber2 = PhoneNumber2,
                 SecondName = SecondName,
-                Addresses = new List<AddressDto>(),
+                Addresses = new List<AddressModel>(),
                 Id = _selectedEntry?.Id
             };
-            foreach (var addressDto in Addresses.Select(address => new AddressDto
+            AddAddresses(entryModel);
+            return entryModel;
+        }
+
+        private void AddAddresses(EntryModel entryModel)
+        {
+            foreach (var addressModel in Addresses.Select(address => new AddressModel
             {
                 PhoneNumber2 = address.PhoneNumber2,
                 City = address.City,
@@ -120,51 +184,19 @@ namespace AddressBook.MainView
                 Street = address.Street
             }))
             {
-                entryDto.Addresses.Add(addressDto);
+                entryModel.Addresses.Add(addressModel);
             }
-            if (entryDto.Id == null)
-            {
-                var entry = ServiceLocator.AddressService.SaveEntry(entryDto);
-                if (Photo != null && entry.Id != null)
-                {
-                    ServiceLocator.PhotoService.SavePhoto(Photo, entry.Id.Value);
-                }
-                AllEntries.Add(entry);
-                Entries.Add(entry);
-                SelectedEntry = entry;
-            }
-            else
-            {
-                var entry = ServiceLocator.AddressService.UpdateEntry(entryDto);
-                AllEntries[AllEntries.IndexOf(SelectedEntry)] = entry;
-                Entries[Entries.IndexOf(SelectedEntry)] = entry;
-                SelectedEntry = entry;
-                if (entry.Id != null)
-                {
-                    if (Photo != null)
-                    {
-                        ServiceLocator.PhotoService.SavePhoto(Photo, entry.Id.Value);
-                    }
-                    else
-                    {
-                        ServiceLocator.PhotoService.DeletePhoto(entry.Id.Value);
-                    }
-                }           
-            }
-            RaisePropertyChanged(() => Entries);
-            RaisePropertyChanged(() => SelectedEntry);
-            NonNewEntry = true;
         }
 
-        private void Exit()
+        private void Logout()
         {
             _navigator.Navigate(LoginViewModel.Name);
         }
 
         private void Search()
         {
-            Entries = new ObservableCollection<EntryDto>(
-            AllEntries.Where(ae => ($"{ae.FirstName}{ae.SecondName}".ToLower()).Contains(SearchText.ToLower())));
+            Entries = new ObservableCollection<EntryModel>(
+            _allEntries.Where(e => (e.ToString().ToLower()).Contains(_searchText.ToLower())));
         }
 
         private void New()
@@ -202,8 +234,9 @@ namespace AddressBook.MainView
 
         private void AddAddress()
         {
-            CurrentAddress = new AddressModel(new AddressDto());
-            Addresses.Add(CurrentAddress);
+            var address = new AddressModel();
+            Addresses.Add(address);
+            CurrentAddress = address;
         }
 
         public ICommand DeleteAddressCommand
@@ -235,7 +268,7 @@ namespace AddressBook.MainView
         {
             var openFileDialog = new OpenFileDialog
             {
-                InitialDirectory = "c:\\",
+                InitialDirectory = InitialPhotoDirectory,
                 Filter = Resources.PhotoImageFormat,
                 FilterIndex = 1,
                 CheckFileExists = true
@@ -369,6 +402,7 @@ namespace AddressBook.MainView
             {
                 _photo = value;
                 RaisePropertyChanged(() => Photo);
+                RaisePropertyChanged(() => CanDeletePhoto);
             }
         }
 
@@ -385,7 +419,16 @@ namespace AddressBook.MainView
             }
         }
 
-        public AddressModel CurrentAddress { get; set; }
+        public AddressModel CurrentAddress
+        {
+            get { return _currentAddress; }
+            set
+            {
+                _currentAddress = value;
+                RaisePropertyChanged(() => CurrentAddress);
+                RaisePropertyChanged(() => AddressSelected);
+            }
+        }
 
         public void DeleteCurrentAddress()
         {
@@ -402,7 +445,7 @@ namespace AddressBook.MainView
             }
         }
 
-        public EntryDto SelectedEntry
+        public EntryModel SelectedEntry
         {
             get
             {
@@ -416,6 +459,7 @@ namespace AddressBook.MainView
                     LoadEntryData();
                 }
                 RaisePropertyChanged(() => SelectedEntry);
+                RaisePropertyChanged(() => EntrySelected);
             }
         }
 
@@ -426,10 +470,14 @@ namespace AddressBook.MainView
             PhoneNumber1 = _selectedEntry.PhoneNumber1;
             PhoneNumber2 = _selectedEntry.PhoneNumber2;
             Birthday = _selectedEntry.Birthday;
+            if (_selectedEntry.Id != null)
+            {
+                Photo = ServiceLocator.PhotoService.GetPhoto(_selectedEntry.Id.Value);
+            }
             LoadAddresses();
         }
 
-        public ObservableCollection<EntryDto> AllEntries
+        public ObservableCollection<EntryModel> AllEntries
         {
             get { return _allEntries; }
             set
@@ -439,7 +487,7 @@ namespace AddressBook.MainView
             }
         }
 
-        public ObservableCollection<EntryDto> Entries
+        public ObservableCollection<EntryModel> Entries
         {
             get { return _entries; }
             set
@@ -454,9 +502,16 @@ namespace AddressBook.MainView
             Addresses = new ObservableCollection<AddressModel>();
             foreach (var address in _selectedEntry.Addresses)
             {
-                Addresses.Add(new AddressModel(address));
+                Addresses.Add((AddressModel)address.Clone());
             }
             CurrentAddress = Addresses.FirstOrDefault();
         }
+
+        private bool Validate()
+        {
+            return !(_firstName.HasOnlyWithespaces() || _firstName.HasOnlyWithespaces());
+        }
+
+        public bool AddressSelected => _currentAddress != null;
     }
 }

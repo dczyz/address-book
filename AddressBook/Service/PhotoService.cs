@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Media.Imaging;
 
@@ -8,58 +6,60 @@ namespace AddressBook.Service
 {
     class PhotoService
     {
+        private static readonly string PhotosDirectoryPath =
+            $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\AddressBook\\Photos";
+
         public BitmapImage GetPhoto(int entryId)
         {
             var image = new BitmapImage();
             image.BeginInit();
             image.CacheOption = BitmapCacheOption.OnLoad;
-            if (
-                !File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) +
-                            $"\\AddressBook\\Photos\\{entryId}.jpg"))
+            var photoPath = GetPhotoPath(entryId);
+            if (!File.Exists(photoPath))
             {
                 return null;
             }
-            image.UriSource = new Uri(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"\\AddressBook\\Photos\\{entryId}.jpg");
+            image.UriSource = new Uri(photoPath);
             image.EndInit();
             return image;
         }
 
         public void SavePhoto(BitmapImage photo, int entryId)
         {
-            if (
-                !Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) +
-                                           "\\AddressBook\\Photos"))
-            {
-                Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) +
-                                           "\\AddressBook\\Photos");
-            }
-            if (
-                File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) +
-                            $"\\AddressBook\\Photos\\{entryId}.jpg"))
-            {
-                File.Delete(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"\\AddressBook\\Photos\\{entryId}.jpg");
-            }
+            var photoPath = GetPhotoPath(entryId);
+            DeleteFileIfExists(photoPath);
             var encoder = new JpegBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(photo));
-            using (
-                var filestream =
-                    new FileStream(
-                        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) +
-                        $"\\AddressBook\\Photos\\{entryId}.jpg", FileMode.Create))
+            using (var filestream =new FileStream(photoPath, FileMode.Create))
             {
                 encoder.Save(filestream);
             }
         }
 
+        private static void DeleteFileIfExists(string path)
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+
         public void DeletePhoto(int entryId)
         {
-            if (
-                File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) +
-                            $"\\AddressBook\\Photos\\{entryId}.jpg"))
+            DeleteFileIfExists(GetPhotoPath(entryId));     
+        }
+
+        public void CreatePhotoDirectoryPathIfNotExists()
+        {
+            if (!Directory.Exists(PhotosDirectoryPath))
             {
-                File.Delete(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) +
-                            $"\\AddressBook\\Photos\\{entryId}.jpg");
-            }         
+                Directory.CreateDirectory(PhotosDirectoryPath);
+            }
+        }
+
+        private static string GetPhotoPath(int entryId)
+        {
+            return $"{PhotosDirectoryPath}\\{entryId}.jpg";
         }
     }
 }

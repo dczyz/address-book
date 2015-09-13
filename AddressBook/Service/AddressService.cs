@@ -4,8 +4,8 @@ using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using AddressBook.Database;
-using AddressBook.Dto;
 using AddressBook.Entity;
+using AddressBook.Model;
 using AddressBook.Session;
 using AutoMapper;
 
@@ -13,7 +13,7 @@ namespace AddressBook.Service
 {
     class AddressService
     {
-        public ICollection<EntryDto> GetEntries(int userId)
+        public ICollection<EntryModel> GetEntries(int userId)
         {
             using (var db = new DatabaseContext())
             {
@@ -21,11 +21,11 @@ namespace AddressBook.Service
             }
         }
 
-        public EntryDto SaveEntry(EntryDto entryDto)
+        public EntryModel SaveEntry(EntryModel entryModel)
         {
             using (var db = new DatabaseContext())
             {
-                var entry = MapToEntry(entryDto);
+                var entry = MapToEntry(entryModel);
                 entry.UserId = AppSession.UserId;
                 db.Entries.Add(entry);
                 db.SaveChanges();
@@ -33,11 +33,11 @@ namespace AddressBook.Service
             }
         }
 
-        public EntryDto UpdateEntry(EntryDto entryDto)
+        public EntryModel UpdateEntry(EntryModel entryModel)
         {
             using (var db = new DatabaseContext())
             {
-                var entry = MapToEntry(entryDto);
+                var entry = MapToEntry(entryModel);
                 entry.UserId = AppSession.UserId;
                 var existingEntry = db.Entries.FirstOrDefault(e => e.Id == entry.Id);
                 var addressesToDelete = existingEntry.Addresses.Where(address => entry.Addresses.All(a => a.Id != address.Id)).ToList();
@@ -64,14 +64,14 @@ namespace AddressBook.Service
             }
         }
 
-        private static EntryDto MapToEntryDto(Entry entry)
+        private static EntryModel MapToEntryDto(Entry entry)
         {
-            return Mapper.Map<EntryDto>(entry);
+            return Mapper.Map<EntryModel>(entry);
         }
 
-        private static Entry MapToEntry(EntryDto entryDto)
+        private static Entry MapToEntry(EntryModel entryModel)
         {
-            return Mapper.Map<Entry>(entryDto);
+            return Mapper.Map<Entry>(entryModel);
         }
     }
 }

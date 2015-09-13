@@ -1,11 +1,9 @@
+using System.Data.Entity.Migrations;
+using AddressBook.Database;
+
 namespace AddressBook.Migrations
 {
-    using System;
-    using System.Data.Entity;
-    using System.Data.Entity.Migrations;
-    using System.Linq;
-
-    internal sealed class Configuration : DbMigrationsConfiguration<AddressBook.Database.DatabaseContext>
+    internal sealed class Configuration : DbMigrationsConfiguration<DatabaseContext>
     {
         public Configuration()
         {
@@ -13,6 +11,6 @@ namespace AddressBook.Migrations
             AutomaticMigrationDataLossAllowed = true;
         }
 
-        protected override void Seed(AddressBook.Database.DatabaseContext context) { }
+        protected override void Seed(DatabaseContext context) { }
     }
 }
