@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace AddressBook.Model
 {
-    class EntryModel
+    public class EntryModel
     {
         public EntryModel()
         {

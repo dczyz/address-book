@@ -9,7 +9,7 @@ using static AutoMapper.Mapper;
 
 namespace AddressBook.Service
 {
-    class AddressService
+    class AddressService : IAddressService
     {
         public ICollection<EntryModel> GetEntries(int userId)
         {

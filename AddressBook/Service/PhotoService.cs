@@ -5,7 +5,7 @@ using static System.IO.FileMode;
 
 namespace AddressBook.Service
 {
-    class PhotoService
+    class PhotoService : IPhotoService
     {
         private static readonly string PhotosDirectoryPath =
             $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\AddressBook\\Photos";

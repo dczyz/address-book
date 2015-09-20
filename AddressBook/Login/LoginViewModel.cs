@@ -1,4 +1,5 @@
 ﻿using System.Windows.Input;
+using AddressBook.Application;
 using AddressBook.MainView;
 using AddressBook.Model;
 using AddressBook.Service;
@@ -8,20 +9,23 @@ using GalaSoft.MvvmLight.CommandWpf;
 
 namespace AddressBook.Login
 {
-    class LoginViewModel : ObservableObject, IPageViewModel
+    public class LoginViewModel : ObservableObject, IPageViewModel
     {
         public static readonly string Name = "Login";
 
-        private readonly INavigator _navigator;
         private ICommand _signUpCommand;
         private string _password;
         private ICommand _loginCommand;
         private string _username;
         private bool _error;
 
-        public LoginViewModel(INavigator navigator)
+        private readonly INavigator _navigator;
+        private readonly IUserService _userService;
+
+        public LoginViewModel(INavigator navigator, IUserService userService)
         {
             _navigator = navigator;
+            _userService = userService;
         }
 
         public void Init() { }
@@ -46,7 +50,7 @@ namespace AddressBook.Login
 
         private void Login()
         {
-            if (ServiceLocator.UserService.Login(new LoginModel(_username, _password)))
+            if (_userService.Login(new LoginModel(_username, _password)))
             {
                 _navigator.Navigate(MainViewModel.Name);
                 return;

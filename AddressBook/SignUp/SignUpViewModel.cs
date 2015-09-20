@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using AddressBook.Application;
 using AddressBook.Login;
 using AddressBook.Model;
 using AddressBook.Service;
@@ -11,12 +12,14 @@ using static System.Windows.MessageBoxImage;
 
 namespace AddressBook.SignUp
 {
-    class SignUpViewModel : ObservableObject, IPageViewModel
+    public class SignUpViewModel : ObservableObject, IPageViewModel
     {
         public static readonly string Name = "SignUp";
 
-        private ICommand _signUpCommand;
         private readonly INavigator _navigator;
+        private readonly IUserService _userService;
+
+        private ICommand _signUpCommand;
         private string _username;
         private string _password;
         private bool _error;
@@ -24,9 +27,10 @@ namespace AddressBook.SignUp
         private ICommand _backToLoginCommand;
         private string _errorText;
 
-        public SignUpViewModel(INavigator navigator)
+        public SignUpViewModel(INavigator navigator, IUserService userService)
         {
             _navigator = navigator;
+            _userService = userService;
         }
 
         public void Init()
@@ -46,7 +50,7 @@ namespace AddressBook.SignUp
         private void SignUp()
         {
             if (!Validate()) return;
-            if (ServiceLocator.UserService.SignUp(new LoginModel(_username, _password)))
+            if (_userService.SignUp(new LoginModel(_username, _password)))
             {
                 MessageBox.Show("You have been successfully signed up", "Information", OK, Information);
                 return;

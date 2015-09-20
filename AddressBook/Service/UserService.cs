@@ -1,13 +1,13 @@
 ﻿using System.Linq;
+using AddressBook.Application;
 using AddressBook.Database;
 using AddressBook.Entity;
 using AddressBook.Model;
-using AddressBook.Session;
 using static AutoMapper.Mapper;
 
 namespace AddressBook.Service
 {
-    class UserService
+    class UserService : IUserService
     {
         public bool Login(LoginModel loginModel)
         {

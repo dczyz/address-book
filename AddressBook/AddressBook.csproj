@@ -94,17 +94,18 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
+    <ApplicationDefinition Include="Application\App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ApplicationViewModel.cs" />
+    <Compile Include="Application\ApplicationViewModel.cs" />
+    <Compile Include="Application\ViewModelLocator.cs" />
     <Compile Include="Model\AddressModel.cs" />
     <Compile Include="Model\EntryModel.cs" />
     <Compile Include="Entity\Address.cs" />
     <Compile Include="Entity\BaseEntity.cs" />
     <Compile Include="Entity\Entry.cs" />
-    <Compile Include="IPageViewModel.cs" />
+    <Compile Include="Application\IPageViewModel.cs" />
     <Compile Include="Login\LoginView.xaml.cs">
       <DependentUpon>LoginView.xaml</DependentUpon>
     </Compile>
@@ -112,24 +113,28 @@
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainView\MainViewModel.cs" />
-    <Compile Include="MapperConfiguration.cs" />
+    <Compile Include="Mapper\MapperConfiguration.cs" />
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="Navigator.cs" />
-    <Compile Include="PasswordHelper.cs" />
+    <Compile Include="Model\LoginModel.cs" />
+    <Compile Include="Application\Navigator.cs" />
+    <Compile Include="Service\IAddressService.cs" />
+    <Compile Include="Service\IPhotoService.cs" />
+    <Compile Include="Service\IUserService.cs" />
+    <Compile Include="Util\PasswordHelper.cs" />
     <Compile Include="Service\AddressService.cs" />
     <Compile Include="Service\PhotoService.cs" />
     <Compile Include="Service\ServiceLocator.cs" />
     <Compile Include="Service\UserService.cs" />
-    <Compile Include="Session\AppSession.cs" />
+    <Compile Include="Application\AppSession.cs" />
     <Compile Include="SignUp\SignUpView.xaml.cs">
       <DependentUpon>SignUpView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Login\LoginViewModel.cs" />
     <Compile Include="SignUp\SignUpViewModel.cs" />
-    <Compile Include="ApplicationView.xaml.cs">
+    <Compile Include="Application\ApplicationView.xaml.cs">
       <DependentUpon>ApplicationView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="StringExtension.cs" />
+    <Compile Include="Extension\StringExtension.cs" />
     <Page Include="Login\LoginView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -138,7 +143,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Compile Include="App.xaml.cs">
+    <Compile Include="Application\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
@@ -148,7 +153,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ApplicationView.xaml">
+    <Page Include="Application\ApplicationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
