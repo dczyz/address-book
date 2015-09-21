@@ -1,4 +1,4 @@
-﻿namespace AddressBook.Application
+﻿namespace AddressBook.Main
 {
     static class AppSession
     {

@@ -1,4 +1,4 @@
-﻿<Window x:Class="AddressBook.ApplicationView"
+﻿<Window x:Class="AddressBook.Main.ApplicationView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:login="clr-namespace:AddressBook.Login"

@@ -1,5 +1,5 @@
 ﻿using System.Windows.Input;
-using AddressBook.Application;
+using AddressBook.Main;
 using AddressBook.MainView;
 using AddressBook.Model;
 using AddressBook.Service;

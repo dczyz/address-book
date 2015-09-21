@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using AddressBook.Application;
 using AddressBook.Login;
+using AddressBook.Main;
 using AddressBook.Model;
 using AddressBook.Service;
 using GalaSoft.MvvmLight;

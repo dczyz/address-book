@@ -3,7 +3,7 @@ using GalaSoft.MvvmLight;
 
 namespace AddressBook.Model
 {
-    class AddressModel : ObservableObject, ICloneable
+     public class AddressModel : ObservableObject, ICloneable
     {
         private string _city;
         private string _postcode;

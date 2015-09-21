@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace AddressBook
+namespace AddressBook.Main
 {
     /// <summary>
     /// Interaction logic for ApplicationView.xaml

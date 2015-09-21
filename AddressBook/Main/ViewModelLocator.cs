@@ -5,7 +5,7 @@ using AddressBook.SignUp;
 using GalaSoft.MvvmLight.Ioc;
 using ServiceLocator = Microsoft.Practices.ServiceLocation.ServiceLocator;
 
-namespace AddressBook.Application
+namespace AddressBook.Main
 {
     class ViewModelLocator
     {
