@@ -16,7 +16,7 @@ namespace AddressBook.Main
             var userService = new UserService();
             var photoService = new PhotoService();
             var addressService = new AddressService();
-            SimpleIoc.Default.Register<ApplicationViewModel>();
+            SimpleIoc.Default.Register(() => applicationViewModel);
             SimpleIoc.Default.Register<IUserService>(() => userService);
             SimpleIoc.Default.Register<IAddressService>(() => addressService);
             SimpleIoc.Default.Register<IPhotoService>(() => photoService);
@@ -26,10 +26,12 @@ namespace AddressBook.Main
         }
 
 
-        public MainViewModel Main => ServiceLocator.Current.GetInstance<MainViewModel>();
+        public static ApplicationViewModel ApplicationViewModel => ServiceLocator.Current.GetInstance<ApplicationViewModel>();
 
-        public LoginViewModel Login => ServiceLocator.Current.GetInstance<LoginViewModel>();
+        public static MainViewModel MainViewModel => ServiceLocator.Current.GetInstance<MainViewModel>();
 
-        public SignUpViewModel SignUpViewModel => ServiceLocator.Current.GetInstance<SignUpViewModel>();
+        public static LoginViewModel LoginViewModel => ServiceLocator.Current.GetInstance<LoginViewModel>();
+
+        public static SignUpViewModel SignUpViewModel => ServiceLocator.Current.GetInstance<SignUpViewModel>();
     }
 }

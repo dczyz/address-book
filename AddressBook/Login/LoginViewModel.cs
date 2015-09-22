@@ -11,7 +11,7 @@ namespace AddressBook.Login
 {
     public class LoginViewModel : ObservableObject, IPageViewModel
     {
-        public static readonly string Name = "Login";
+        public static readonly string Name = "LoginViewModel";
 
         private ICommand _signUpCommand;
         private string _password;

@@ -7,8 +7,8 @@ namespace AddressBook.Mapper
     {
         public static void Configure()
         {
-            AutoMapper.Mapper.CreateMap<Entity.Address, AddressModel>();
-            AutoMapper.Mapper.CreateMap<AddressModel, Entity.Address>()
+            AutoMapper.Mapper.CreateMap<Address, AddressModel>();
+            AutoMapper.Mapper.CreateMap<AddressModel, Address>()
                 .ForMember(d => d.Entry, o => o.Ignore());
 
             AutoMapper.Mapper.CreateMap<Entry, EntryModel>();

@@ -14,8 +14,9 @@ namespace AddressBook.Main
             base.OnStartup(e);
 
             var app = new ApplicationView();
-            var context = new ApplicationViewModel();
-            app.DataContext = context;
+            var applicationViewModel = ViewModelLocator.ApplicationViewModel;
+            applicationViewModel.Init();
+            app.DataContext = applicationViewModel;
             MapperConfiguration.Configure();
             ServiceLocator.PhotoService.CreatePhotoDirectoryPathIfNotExists();
             app.Show();

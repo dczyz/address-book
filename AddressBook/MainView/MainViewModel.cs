@@ -22,7 +22,7 @@ namespace AddressBook.MainView
 {
     public class MainViewModel : ObservableObject, IPageViewModel
     {
-        public readonly static string Name = "Main";
+        public readonly static string Name = "MainViewModel";
         private const string InitialPhotoDirectory = "c:\\";
 
         private string _firstName;
@@ -143,8 +143,8 @@ namespace AddressBook.MainView
             {
                 _photoService.DeletePhoto(entryId);
             }
-            AllEntries[AllEntries.IndexOf(SelectedEntry)] = entry;
-            Entries[Entries.IndexOf(SelectedEntry)] = entry;
+            _allEntries[AllEntries.IndexOf(_selectedEntry)] = entry;
+            _entries[Entries.IndexOf(_selectedEntry)] = entry;
             SelectedEntry = entry;
         }
 
@@ -241,8 +241,8 @@ namespace AddressBook.MainView
 
         private void AddAddress()
         {
-            var address = new AddressModel();
-            Addresses.Add(address);
+            var address = new AddressModel {AddressName = $"Address {_addresses.Count + 1}"};
+            _addresses.Add(address);
             CurrentAddress = address;
         }
 
@@ -258,6 +258,7 @@ namespace AddressBook.MainView
         private void DeleteAddress()
         {
             DeleteCurrentAddress();
+            MessageBox.Show("Data has been successfully deleted", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         public bool EntrySelected => SelectedEntry != null || !NonNewEntry;
@@ -321,8 +322,8 @@ namespace AddressBook.MainView
             {
                 _addressService.DeleteEntry(_selectedEntry.Id.Value);
             }
-            AllEntries.Remove(SelectedEntry);
-            Entries.Remove(SelectedEntry);
+            _allEntries.Remove(SelectedEntry);
+            _entries.Remove(SelectedEntry);
             SelectedEntry = null;
         }
 
@@ -439,17 +440,19 @@ namespace AddressBook.MainView
 
         public void DeleteCurrentAddress()
         {
-            if (Addresses.Count > 1)
+            if (Addresses.Count == 0)
             {
-                var index = Addresses.IndexOf(CurrentAddress);
-                CurrentAddress = Addresses[index - 1];
-                Addresses.RemoveAt(index);
-            }
-            else
-            {
-                Addresses.Remove(CurrentAddress);
+                _addresses.Remove(CurrentAddress);
                 CurrentAddress = null;
+                return;
             }
+            var index = _addresses.IndexOf(_currentAddress);
+            _addresses.RemoveAt(index);
+            for (var i = index; i < _addresses.Count; i++)
+            {
+                _addresses[i].AddressName = $"Address {i + 1}";
+            }
+            CurrentAddress = index == _addresses.Count ? _addresses.Last() : _addresses[index];
         }
 
         public EntryModel SelectedEntry
@@ -507,16 +510,19 @@ namespace AddressBook.MainView
         private void LoadAddresses()
         {
             Addresses = new ObservableCollection<AddressModel>();
-            foreach (var address in _selectedEntry.Addresses)
+            var addresses = _selectedEntry.Addresses.OrderBy(a => a.Id).ToList();
+            for (var i = 0; i < addresses.Count(); i++)
             {
-                Addresses.Add((AddressModel)address.Clone());
+                var addressCopy = (AddressModel) addresses[i].Clone();
+                addressCopy.AddressName = $"Address {i}";
+                _addresses.Add(addressCopy);
             }
-            CurrentAddress = Addresses.FirstOrDefault();
+            CurrentAddress = _addresses.FirstOrDefault();
         }
 
         private bool Validate()
         {
-            return !(_firstName.HasOnlyWithespaces() || _firstName.HasOnlyWithespaces());
+            return !(_firstName.HasOnlyWithespaces() || _secondName.HasOnlyWithespaces());
         }
 
         public bool AddressSelected => _currentAddress != null;

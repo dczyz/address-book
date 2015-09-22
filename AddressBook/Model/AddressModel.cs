@@ -14,6 +14,7 @@ namespace AddressBook.Model
         private string _phonenumber2;
         private string _phonenumber3;
         private string _faxNumber;
+        private string _addressName;
 
         public string City
         {
@@ -123,5 +124,15 @@ namespace AddressBook.Model
         {
             return MemberwiseClone();
         }
+
+         public string AddressName
+         {
+             get { return _addressName; }
+             set
+             {
+                 _addressName = value;
+                 RaisePropertyChanged(() => AddressName);
+             }
+         }
     }
 }

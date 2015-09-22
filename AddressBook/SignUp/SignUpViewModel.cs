@@ -14,7 +14,7 @@ namespace AddressBook.SignUp
 {
     public class SignUpViewModel : ObservableObject, IPageViewModel
     {
-        public static readonly string Name = "SignUp";
+        public static readonly string Name = "SignUpViewModel";
 
         private readonly INavigator _navigator;
         private readonly IUserService _userService;
@@ -60,17 +60,17 @@ namespace AddressBook.SignUp
 
         private bool Validate()
         {
-            if(Username == null || Username.Length < 3 || Username.Any(char.IsWhiteSpace))
+            if(_username == null || _username.Length < 3 || _username.Any(char.IsWhiteSpace))
             {
                 ShowError("Username must have at least 3 no-whitespace characters");
                 return false;
             }
-            if (Password == null || Password.Length < 6 || Password.Any(char.IsWhiteSpace))
+            if (_password == null || _password.Length < 6 || _password.Any(char.IsWhiteSpace))
             {
                 ShowError("Password must have at least 6 no-whitespace characters");
                 return false;
             }
-            if (Password != ConfirmPassword)
+            if (_password != _confirmPassword)
             {
                 ShowError("Passwords don't match");
                 return false;

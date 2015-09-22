@@ -1,34 +1,24 @@
 ﻿using System.Collections.Generic;
 using AddressBook.Login;
 using AddressBook.MainView;
-using AddressBook.Service;
 using AddressBook.SignUp;
 using GalaSoft.MvvmLight;
-using ServiceLocator = Microsoft.Practices.ServiceLocation.ServiceLocator;
 
 namespace AddressBook.Main
 {
-    public class ApplicationViewModel : ObservableObject, INavigator
+    public class ApplicationViewModel : ObservableObject, INavigator, IPageViewModel
     {
         private IPageViewModel _currentPageViewModel;
 
-        private Dictionary<string, IPageViewModel> _pageViewModels;
+        private readonly Dictionary<string, IPageViewModel> _pageViewModels = new Dictionary<string, IPageViewModel>();
 
-        public ApplicationViewModel()
+        public void Init()
         {
-            var serviceLocator = ServiceLocator.Current;
-            var userService = serviceLocator.GetInstance<IUserService>();
-            var login = new LoginViewModel(this, userService);
-            PageViewModels.Add(LoginViewModel.Name, login);
-            var signUp = new SignUpViewModel(this, userService);
-            PageViewModels.Add(SignUpViewModel.Name, signUp);
-            var main = new MainViewModel(this, serviceLocator.GetInstance<IAddressService>(), serviceLocator.GetInstance<IPhotoService>());
-            PageViewModels.Add(MainViewModel.Name, main);
-
-            CurrentPageViewModel = login;
+            _pageViewModels.Add(LoginViewModel.Name, ViewModelLocator.LoginViewModel);
+            _pageViewModels.Add(SignUpViewModel.Name, ViewModelLocator.SignUpViewModel);
+            _pageViewModels.Add(MainViewModel.Name, ViewModelLocator.MainViewModel);
+            CurrentPageViewModel = _pageViewModels[LoginViewModel.Name];
         }
-
-        public Dictionary<string, IPageViewModel> PageViewModels => _pageViewModels ?? (_pageViewModels = new Dictionary<string, IPageViewModel>());
 
         public IPageViewModel CurrentPageViewModel
         {
@@ -46,7 +36,7 @@ namespace AddressBook.Main
 
         public void Navigate(string viewModelName)
         {
-            var currentPageViewModel = PageViewModels[viewModelName];
+            var currentPageViewModel = _pageViewModels[viewModelName];
             currentPageViewModel.Init();
             CurrentPageViewModel = currentPageViewModel;
         }
