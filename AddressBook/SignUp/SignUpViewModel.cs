@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using AddressBook.Extension;
 using AddressBook.Login;
 using AddressBook.Main;
 using AddressBook.Model;
@@ -53,6 +54,7 @@ namespace AddressBook.SignUp
             if (_userService.SignUp(new LoginModel(_username, _password)))
             {
                 MessageBox.Show("You have been successfully signed up", "Information", OK, Information);
+                _navigator.Navigate(LoginViewModel.Name);
                 return;
             }
             ShowError("User with given username already exists");

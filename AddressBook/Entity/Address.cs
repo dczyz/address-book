@@ -16,6 +16,8 @@
 
         public string PhoneNumber2 { get; set; }
 
+        public string PhoneNumber3 { get; set; }
+
         public string FaxNumber { get; set; }
 
         public virtual Entry Entry { get; set; }

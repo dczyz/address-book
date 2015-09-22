@@ -1,4 +1,7 @@
-﻿namespace AddressBook.SignUp
+﻿using AddressBook.Extension;
+using static System.Windows.Window;
+
+namespace AddressBook.SignUp
 {
     /// <summary>
     /// Interaction logic for SignUpView.xaml

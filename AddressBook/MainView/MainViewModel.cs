@@ -29,6 +29,7 @@ namespace AddressBook.MainView
         private string _secondName;
         private string _phoneNumber1;
         private string _phoneNumber2;
+        private string _phoneNumber3;
         private string _searchText;
         private DateTime _birthday;
         private BitmapImage _photo;
@@ -188,7 +189,8 @@ namespace AddressBook.MainView
                 Id = address.Id,
                 PhoneNumber1 = address.PhoneNumber1,
                 Postcode = address.Postcode,
-                Street = address.Street
+                Street = address.Street,
+                PhoneNumber3  = address.PhoneNumber3
             }))
             {
                 entryModel.Addresses.Add(addressModel);
